@@ -29,10 +29,14 @@ const userSchema = new mongoose.Schema(
       enum: [true, false],
       default: false,
     },
-    interests: [{ type: String,required:true }],
+    interests: { type: [String],required:true },
     otp: {
       type: String,
     },
+    auth:{
+      type:String,
+      default:"user"
+    }
   },
   {
     timestamps: true,

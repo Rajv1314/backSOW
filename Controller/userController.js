@@ -1,35 +1,44 @@
 const UserModel = require("../Model/userModel");
-const {otp,sentOtp}= require('../utils/helper')
+const { otp, sentOtp } = require("../utils/helper");
 const addUser = async (req, res) => {
-  const { name, email, password,mobile,location } = req.body;
+  const { name, email, password, mobile, location, interests } = req.body;
+  console.log(res.body);
+  
   try {
     let user = await UserModel.find({ email });
     if (user.length === 0) {
-      user = await  UserModel({name, email, password,mobile,location})
+      user = await UserModel({
+        name,
+        email,
+        password,
+        mobile,
+        location,
+        interests
+      });
       user = await user.save();
       res.status(201).send({ massage: "Success !", data: user });
     } else {
-      res.status(401).send({ massage: "Email is already exist", data: req.body });
+      res
+        .status(401)
+        .send({ massage: "Email is already exist", data: req.body });
     }
   } catch (error) {
     res.status(400).send({ massage: "Failed !", data: "", error: error });
   }
 };
 const getUser = async (req, res) => {
-    try {
-      let userdata = await UserModel.find({}); 
-      res.status(200).send({ message: "Success!", data: userdata });
-    } catch (error) {
-      console.log("Error fetching users:", error); 
-      res.status(500).send({ message: "Request failed", data: "", error: error });
-    }
-  };
- 
+  try {
+    let userdata = await UserModel.find({});
+    res.status(200).send({ message: "Success!", data: userdata });
+  } catch (error) {
+    console.log("Error fetching users:", error);
+    res.status(500).send({ message: "Request failed", data: "", error: error });
+  }
+};
 
 const updateUserName = async (req, res) => {
-  const { userId, newName } = req.body; 
+  const { userId, newName } = req.body;
   try {
-   
     let user = await UserModel.findById(userId);
 
     if (!user) {
@@ -39,7 +48,9 @@ const updateUserName = async (req, res) => {
 
     user = await user.save();
 
-    res.status(200).send({ message: "User name updated successfully!", data: user });
+    res
+      .status(200)
+      .send({ message: "User name updated successfully!", data: user });
   } catch (error) {
     console.log(error);
     res.status(500).send({ message: "Error updating user name", error: error });
@@ -47,10 +58,10 @@ const updateUserName = async (req, res) => {
 };
 
 // const deleteUserById = async (req, res) => {
-//   const { userId } = req.params; 
+//   const { userId } = req.params;
 
 //   try {
-    
+
 //     const user = await UserModel.findByIdAndDelete(userId);
 
 //     if (!user) {
@@ -64,19 +75,22 @@ const updateUserName = async (req, res) => {
 //   }
 // };
 
-const login = async (req,res) => {
-    try {
-      
-      let token = await UserModel.matchPassword(req.body.email,req.body.password); 
-      res.status(200).send({message:"login Success !",data:{token:token}})
-    } catch (error) {
-      res.status(400).send({message:"Login Failed !",data:"",Error:"Login Failed"})
-      
-    }}
+const login = async (req, res) => {
+  try {
+    let token = await UserModel.matchPassword(
+      req.body.email,
+      req.body.password
+    );
+    res
+      .status(200)
+      .send({ message: "login Success !", data: { token: token } });
+  } catch (error) {
+    res
+      .status(400)
+      .send({ message: "Login Failed !", data: "", Error: "Login Failed" });
+  }
+};
 
-
-
- 
 const forgotPassword = async (req, res) => {
   try {
     let user = await UserModel.findOne({ email: req.body.email });
@@ -99,8 +113,7 @@ const forgotPassword = async (req, res) => {
   }
 };
 
-
-const verifyOtp = async (req,res) => {
+const verifyOtp = async (req, res) => {
   try {
     let userData = await UserModel.findOne({ email: req.params.email });
     if (userData.otp == req.body.otp) {
@@ -113,8 +126,7 @@ const verifyOtp = async (req,res) => {
       .status(400)
       .send({ message: "request   Failed ! ", data: "", error: error });
   }
-}
-
+};
 
 const resetPassword = async (req, res) => {
   try {
@@ -137,6 +149,12 @@ const resetPassword = async (req, res) => {
   }
 };
 
-
-
-module.exports = { addUser,getUser,updateUserName,login,forgotPassword,verifyOtp,resetPassword};
+module.exports = {
+  addUser,
+  getUser,
+  updateUserName,
+  login,
+  forgotPassword,
+  verifyOtp,
+  resetPassword,
+};
