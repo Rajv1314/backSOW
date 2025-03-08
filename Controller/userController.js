@@ -1,9 +1,10 @@
+const { createHmac } = require("crypto");
 const UserModel = require("../Model/userModel");
 const { otp, sentOtp } = require("../utils/helper");
 const addUser = async (req, res) => {
   const { name, email, password, mobile, location, interests } = req.body;
   console.log(res.body);
-  
+
   try {
     let user = await UserModel.find({ email });
     if (user.length === 0) {
@@ -13,7 +14,7 @@ const addUser = async (req, res) => {
         password,
         mobile,
         location,
-        interests
+        interests,
       });
       user = await user.save();
       res.status(201).send({ massage: "Success !", data: user });
@@ -143,9 +144,44 @@ const resetPassword = async (req, res) => {
     );
     res.status(200).send({ message: "password updated !", data: data });
   } catch (error) {
+    console.log(error);
     res
       .status(400)
       .send({ message: "request   Failed ! ", data: "", error: error });
+  }
+};
+
+const addIntersts = async (req, res) => {
+  try {
+    const { id } = req.params;
+    let { interests } = req.body;
+
+  
+    if (typeof interests === "string") {
+      try {
+        interests = JSON.parse(interests); // Convert JSON string to array
+      } catch (error) {
+        return res.status(400).json({ message: "Invalid interests format" });
+      }
+    }
+
+    if (!Array.isArray(interests)) {
+      return res.status(400).json({ message: "Interests should be an array" });
+    }
+
+    const user = await UserModel.findByIdAndUpdate(
+      id,
+      { $addToSet: { interests: { $each: interests } } },
+      { new: true }
+    );
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.json({ message: "Interests updated successfully", user });
+  } catch (error) {
+    res.status(500).json({ message: "Error updating interests", error });
   }
 };
 
@@ -156,5 +192,6 @@ module.exports = {
   login,
   forgotPassword,
   verifyOtp,
+  addIntersts,
   resetPassword,
 };

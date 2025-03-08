@@ -7,7 +7,8 @@ const {
   login,
   forgotPassword,
   resetPassword,
-  verifyOtp
+  verifyOtp,
+  addIntersts
 } = require("../Controller/userController");
 
 const router = express.Router();
@@ -18,5 +19,6 @@ router.route("/login").post(login);
 router.route("/forgotpassword").post(forgotPassword);
 router.route("/verifyotp/:email").post(verifyOtp);
 router.route("/resetpassword/:email").patch(resetPassword);
+router.route("/addinterest/:id").patch(addIntersts);
 
 module.exports = router;
